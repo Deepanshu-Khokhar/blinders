@@ -1,0 +1,58 @@
+{
+  "name": "engineering-scope",
+  "version": "1.0.0",
+  "description": "Scope control for Claude Code and OpenCode agents: finish what the task needs, skip what nothing needs, stay inside the requested authority, and stop when the result is verified.",
+  "keywords": [
+    "claude-code",
+    "opencode",
+    "coding-agents",
+    "scope-control",
+    "overengineering",
+    "guardrails",
+    "ai-agents",
+    "developer-tools"
+  ],
+  "author": "Deepanshu Khokhar",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Deepanshu-Khokhar/engineering-scope.git"
+  },
+  "homepage": "https://github.com/Deepanshu-Khokhar/engineering-scope#readme",
+  "bugs": {
+    "url": "https://github.com/Deepanshu-Khokhar/engineering-scope/issues"
+  },
+  "main": "./opencode/engineering-scope.mjs",
+  "bin": {
+    "esc": "./scripts/esc.cjs"
+  },
+  "exports": {
+    ".": "./opencode/engineering-scope.mjs",
+    "./server": "./opencode/engineering-scope.mjs"
+  },
+  "files": [
+    "server.mjs",
+    "opencode/",
+    "src/",
+    "hooks/",
+    "assets",
+    "skills/",
+    "scripts/esc.cjs",
+    "scripts/case-bundle-lib.cjs",
+    "scripts/generated/case-bundle-v1-validator.cjs",
+    ".claude-plugin/",
+    "INSTALL.md",
+    "PRIVACY.md",
+    "README.md"
+  ],
+  "scripts": {
+    "esc": "node scripts/esc.cjs"
+  },
+  "engines": {
+    "node": ">=18",
+    "opencode": ">=1.18.18 <2 || >=2.0.18 <3"
+  },
+  "dependencies": {
+    "@opencode/schema": "2.0.26",
+    "effect": "4.0.0-rc.112"
+  }
+}

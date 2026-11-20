@@ -1,0 +1,18 @@
+{
+  "name": "engineering-scope",
+  "description": "Keep coding-agent work on the task: finish what it needs, skip what nothing needs, stay inside your authority, and stop when the result is verified.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Deepanshu Khokhar"
+  },
+  "homepage": "https://github.com/Deepanshu-Khokhar/engineering-scope",
+  "repository": "https://github.com/Deepanshu-Khokhar/engineering-scope",
+  "keywords": [
+    "claude-code",
+    "opencode",
+    "coding-agents",
+    "scope-control",
+    "overengineering",
+    "guardrails"
+  ]
+}
