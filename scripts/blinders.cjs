@@ -11,7 +11,7 @@ const { recordAnnotation } = require('../src/runtime-annotations.cjs');
 const { validateCaseBundle } = require('./case-bundle-lib.cjs');
 
 const root = path.resolve(__dirname, '..');
-const latestReleaseEndpoint = 'https://api.github.com/repos/Deepanshu-Khokhar/engineering-scope/releases/latest';
+const latestReleaseEndpoint = 'https://api.github.com/repos/Deepanshu-Khokhar/blinders/releases/latest';
 
 function parseArgs(argv) {
   const positional = [];
@@ -31,13 +31,13 @@ function parseArgs(argv) {
 }
 
 function defaultDataDir() {
-  if (process.env.ESC_RUNTIME_DATA) return path.resolve(process.env.ESC_RUNTIME_DATA);
+  if (process.env.BLINDERS_RUNTIME_DATA) return path.resolve(process.env.BLINDERS_RUNTIME_DATA);
   if (process.env.PLUGIN_DATA) return path.resolve(process.env.PLUGIN_DATA);
   if (process.env.CLAUDE_PLUGIN_DATA) return path.resolve(process.env.CLAUDE_PLUGIN_DATA);
   const base = process.platform === 'win32'
     ? process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local')
     : process.env.XDG_STATE_HOME || path.join(os.homedir(), '.local', 'state');
-  return path.join(base, 'engineering-scope');
+  return path.join(base, 'blinders');
 }
 
 function resolveDataDir(explicit) {
@@ -52,7 +52,7 @@ async function latestRelease() {
   const response = await fetch(latestReleaseEndpoint, {
     headers: {
       Accept: 'application/vnd.github+json',
-      'User-Agent': 'engineering-scope-update-check',
+      'User-Agent': 'blinders-update-check',
       'X-GitHub-Api-Version': '2026-03-10'
     },
     signal: AbortSignal.timeout(10_000)
@@ -143,16 +143,16 @@ async function main() {
   }
   throw new Error([
     'Usage:',
-    '  npm run esc -- doctor [--check-update] [--data-dir <path>]',
-    '  npm run esc -- runtime [--data-dir <path>]',
-    '  npm run esc -- explain <eventId> [--data-dir <path>]',
-    '  npm run esc -- label <eventId> correct|incorrect|inconclusive [--data-dir <path>]',
-    '  npm run esc -- case new --id <slug> [--output <path>]',
-    '  npm run esc -- case validate <directory>'
+    '  npm run blinders -- doctor [--check-update] [--data-dir <path>]',
+    '  npm run blinders -- runtime [--data-dir <path>]',
+    '  npm run blinders -- explain <eventId> [--data-dir <path>]',
+    '  npm run blinders -- label <eventId> correct|incorrect|inconclusive [--data-dir <path>]',
+    '  npm run blinders -- case new --id <slug> [--output <path>]',
+    '  npm run blinders -- case validate <directory>'
   ].join('\n'));
 }
 
 main().catch((error) => {
-  process.stderr.write(`esc failed: ${error.message}\n`);
+  process.stderr.write(`blinders failed: ${error.message}\n`);
   process.exitCode = 1;
 });

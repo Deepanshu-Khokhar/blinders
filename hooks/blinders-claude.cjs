@@ -39,6 +39,6 @@ function readStdin(maxWaitMs = 1500) {
     }
   } catch (error) {
     const errorName = error && error.name ? error.name : 'HookError';
-    process.stderr.write(`Engineering Scope Claude hook failed open: ${errorName}\n`);
+    process.stderr.write(`Blinders Claude hook failed open: ${errorName}\n`);
   }
 })();

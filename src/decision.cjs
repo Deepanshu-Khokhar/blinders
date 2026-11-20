@@ -55,10 +55,10 @@ function decide({ contract, action, state = {}, delegation = inspectDelegation(s
   const level = contract.level || 'watch';
 
   if (state.storageError) {
-    const lockDamaged = state.storageError.code === 'ESC_LOCK_DAMAGED';
+    const lockDamaged = state.storageError.code === 'BLINDERS_LOCK_DAMAGED';
     return action.mutability === 'read' || action.mutability === 'control' && !action.delegationLifecycleUnproven
       ? decision('allow', null, 'RECOVERY_READ_ONLY', 'Read-only recovery remains available.', null)
-      : decision('deny_and_explain', 'I', lockDamaged ? 'ESC_LOCK_DAMAGED' : 'STATE_DAMAGED', state.storageError.message,
+      : decision('deny_and_explain', 'I', lockDamaged ? 'BLINDERS_LOCK_DAMAGED' : 'STATE_DAMAGED', state.storageError.message,
         lockDamaged ? 'Follow the legacy lock recovery steps in INSTALL.md. Keep saved contracts and delegation records.'
           : 'Restore the saved state from a known-good backup or start a new host session. Do not clear unresolved delegation records.');
   }
@@ -74,7 +74,7 @@ function decide({ contract, action, state = {}, delegation = inspectDelegation(s
       controlledOutcome(level),
       'S',
       'INVALID_DIRECTIVE',
-      `The active Engineering Scope directive is invalid: ${state.directiveError.message || state.directiveError.code || 'unknown directive error'}.`,
+      `The active Blinders directive is invalid: ${state.directiveError.message || state.directiveError.code || 'unknown directive error'}.`,
       'Submit a corrected directive for the reported field before delegating.'
     );
   }

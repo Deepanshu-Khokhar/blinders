@@ -1,9 +1,9 @@
 ---
-name: engineering-scope
-description: Complete requested work while preventing speculative defenses and scope creep. Use when considering extra hardening, reviewing possible overengineering, resolving repeated verification loops, following explicit task boundaries, or when the user invokes Engineering Scope. Ordinary use of validation, retries, or dependencies alone is not a trigger.
+name: blinders
+description: Complete requested work while preventing speculative defenses and scope creep. Use when considering extra hardening, reviewing possible overengineering, resolving repeated verification loops, following explicit task boundaries, or when the user invokes Blinders. Ordinary use of validation, retries, or dependencies alone is not a trigger.
 ---
 
-# Engineering Scope
+# Blinders
 
 Meet the task's responsibilities in full. Let real needs drive complexity.
 
@@ -96,15 +96,15 @@ use the host-native invocation form.
 Claude Code plugin:
 
 ```text
-/engineering-scope:engineering-scope change -- Fix the failing config test.
-/engineering-scope:engineering-scope review -- Review this diff. Report findings; do not edit.
+/blinders:blinders change -- Fix the failing config test.
+/blinders:blinders review -- Review this diff. Report findings; do not edit.
 ```
 
 Host-neutral directive at the start of a prompt, including OpenCode:
 
 ```text
-$engineering-scope change -- Fix the failing config test.
-$engineering-scope review -- Review this diff. Report findings; do not edit.
+$blinders change -- Fix the failing config test.
+$blinders review -- Review this diff. Report findings; do not edit.
 ```
 
 Submit one directive on the first non-empty line, outside quotes and code
@@ -119,25 +119,25 @@ unobserved.
 
 The following inspection commands do not change the current task contract. In
 Claude Code, pass the text after the namespaced slash command; in OpenCode, use
-the `$engineering-scope` form shown below.
+the `$blinders` form shown below.
 
 ```text
-$engineering-scope status
-$engineering-scope runtime
-$engineering-scope explain evt_...
-$engineering-scope label evt_... correct|incorrect|inconclusive
+$blinders status
+$blinders runtime
+$blinders explain evt_...
+$blinders label evt_... correct|incorrect|inconclusive
 ```
 
 Use a hard file lock only when the complete boundary is already known:
 
 ```text
-$engineering-scope lock change files=src/config.cjs|test/config.test.cjs -- Fix this behavior.
+$blinders lock change files=src/config.cjs|test/config.test.cjs -- Fix this behavior.
 ```
 
 The active delegation limit is a session control:
 
 ```text
-$engineering-scope change agents=N -- Run the task.
+$blinders change agents=N -- Run the task.
 ```
 
 `agents=N` limits reserved concurrent capacity. It defaults to unlimited, and
@@ -154,7 +154,7 @@ never event arrival order.
 Claude Code equivalent:
 
 ```text
-/engineering-scope:engineering-scope lock change files=src/config.cjs|test/config.test.cjs -- Fix this behavior.
+/blinders:blinders lock change files=src/config.cjs|test/config.test.cjs -- Fix this behavior.
 ```
 
 Do not invent a file list to appear precise. Inspect proportionately and explain

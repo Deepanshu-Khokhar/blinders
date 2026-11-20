@@ -1,12 +1,12 @@
 {
-  "name": "engineering-scope",
-  "description": "Keep coding-agent work on the task: finish what it needs, skip what nothing needs, stay inside your authority, and stop when the result is verified.",
+  "name": "blinders",
+  "description": "Blinders for coding agents: declare what a turn may touch, and hold every tool call to it.",
   "version": "1.0.0",
   "author": {
     "name": "Deepanshu Khokhar"
   },
-  "homepage": "https://github.com/Deepanshu-Khokhar/engineering-scope",
-  "repository": "https://github.com/Deepanshu-Khokhar/engineering-scope",
+  "homepage": "https://github.com/Deepanshu-Khokhar/blinders",
+  "repository": "https://github.com/Deepanshu-Khokhar/blinders",
   "keywords": [
     "claude-code",
     "opencode",

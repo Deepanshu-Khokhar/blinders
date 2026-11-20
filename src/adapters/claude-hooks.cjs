@@ -25,19 +25,19 @@ function isEngineeringScopeExpansion(input) {
   if (!input || input.hook_event_name !== 'UserPromptExpansion') return false;
   if (input.expansion_type && input.expansion_type !== 'slash_command') return false;
   const name = String(input.command_name || '');
-  return /^(?:engineering-scope:)?engineering-scope$/i.test(name);
+  return /^(?:blinders:)?blinders$/i.test(name);
 }
 
 function expansionDirective(input) {
   const args = String(input.command_args || '').replace(/^[ \t]+/, '');
-  return `$engineering-scope${args ? ` ${args}` : ''}`;
+  return `$blinders${args ? ` ${args}` : ''}`;
 }
 
 function slashDirective(prompt) {
   const text = String(prompt || '');
-  const match = /^(?:[ \t]*\r?\n)* {0,3}\/(?:engineering-scope:)?engineering-scope(?=$|[\s,:])/i.exec(text);
+  const match = /^(?:[ \t]*\r?\n)* {0,3}\/(?:blinders:)?blinders(?=$|[\s,:])/i.exec(text);
   if (!match) return null;
-  return `$engineering-scope${text.slice(match[0].length)}`;
+  return `$blinders${text.slice(match[0].length)}`;
 }
 
 
@@ -71,7 +71,7 @@ function toControlEvent(input) {
     event.prompt = input.hook_event_name === 'UserPromptExpansion'
       ? expansionDirective(input)
       // Hosts without the UserPromptExpansion event still route a direct
-      // /engineering-scope... invocation through UserPromptSubmit; treat the
+      // /blinders... invocation through UserPromptSubmit; treat the
       // slash form as the same directive so the Guard arms before tool use.
       : slashDirective(input.prompt) || String(input.prompt || '');
   }

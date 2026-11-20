@@ -1,4 +1,4 @@
-# Install Engineering Scope
+# Install Blinders
 
 These instructions target version 1.0.0. For local checkout validation, use the
 flow under [Verify the source](#verify-the-source).
@@ -8,8 +8,8 @@ flow under [Verify the source](#verify-the-source).
 The Guard requires Node.js 18 or newer. Install from GitHub:
 
 ```bash
-/plugin marketplace add Deepanshu-Khokhar/engineering-scope
-/plugin install engineering-scope@engineering-scope
+/plugin marketplace add Deepanshu-Khokhar/blinders
+/plugin install blinders@blinders
 ```
 
 From a local checkout, register the checkout itself as a marketplace:
@@ -17,15 +17,15 @@ From a local checkout, register the checkout itself as a marketplace:
 ```bash
 claude plugin validate .
 claude plugin marketplace add ./
-claude plugin install engineering-scope@engineering-scope
+claude plugin install blinders@blinders
 ```
 
 Restart Claude Code after installation. The packaged manifest registers:
 
 - `SessionStart` — injects the current contract into a new session;
-- `UserPromptSubmit` — reads host-neutral `$engineering-scope ...` directives,
+- `UserPromptSubmit` — reads host-neutral `$blinders ...` directives,
   natural explicit corrections, and the direct namespaced slash form
-  (`/engineering-scope:engineering-scope ...`). Handling the slash form here
+  (`/blinders:blinders ...`). Handling the slash form here
   keeps direct Skill invocation armed even on hosts that do not expose the
   `UserPromptExpansion` event;
 - `PreToolUse` — classifies covered actions and can return permission deny;
@@ -46,7 +46,7 @@ OpenCode V1 1.18.18 or newer can install this repository directly from GitHub
 without a checkout or npm publication:
 
 ```bash
-opencode plugin add github:Deepanshu-Khokhar/engineering-scope
+opencode plugin add github:Deepanshu-Khokhar/blinders
 ```
 
 The command installs the package into OpenCode's cache and adds the GitHub spec
@@ -54,19 +54,19 @@ to the global OpenCode configuration. Package lifecycle scripts are not run.
 Restart OpenCode, then set a contract with the host-neutral form:
 
 ```text
-$engineering-scope review -- Review this diff; do not edit.
+$blinders review -- Review this diff; do not edit.
 ```
 
 The plugin installs the executable Guard. It does not automatically
-register the bundled Skill or an `/esc` alias. To add only the optional alias,
+register the bundled Skill or an `/blinders` alias. To add only the optional alias,
 put this entry in your OpenCode configuration:
 
 ```json
 {
   "command": {
-    "esc": {
-      "description": "Set the Engineering Scope task contract",
-      "template": "$engineering-scope $ARGUMENTS"
+    "blinders": {
+      "description": "Set the Blinders task contract",
+      "template": "$blinders $ARGUMENTS"
     }
   }
 }
@@ -76,11 +76,11 @@ OpenCode V1 denies covered actions by throwing before tool execution. `deps=ask`
 and `hash=ask` therefore stop the action and ask you to submit a new explicit
 `allow` contract; they do not open a second interactive permission prompt.
 
-Contract state and runtime metadata use `engineering-scope/` below `opencode/`
+Contract state and runtime metadata use `blinders/` below `opencode/`
 in the OpenCode state directory: `XDG_STATE_HOME` or `~/.local/state` on Unix,
 and `LOCALAPPDATA` on Windows. A plugin `dataDir` option overrides this.
 OpenCode V1 currently has no external-plugin uninstall subcommand; remove
-`github:Deepanshu-Khokhar/engineering-scope` from the global configuration's
+`github:Deepanshu-Khokhar/blinders` from the global configuration's
 `plugin` list, then restart OpenCode.
 
 ### OpenCode V2
@@ -94,31 +94,31 @@ For local acceptance, install this checkout's dependencies with
 ```json
 {
   "plugins": [
-    { "package": "/absolute/path/to/engineering-scope" }
+    { "package": "/absolute/path/to/blinders" }
   ]
 }
 ```
 
-On Windows, use a path such as `C:/projects/engineering-scope`. OpenCode 2.0.18
+On Windows, use a path such as `C:/projects/blinders`. OpenCode 2.0.18
 ignores explicitly configured single-file paths; point at the directory that
 contains `package.json`. A packed local artifact can instead be installed with
-`npm install --ignore-scripts /path/to/engineering-scope.tgz`; configure the
-installed `node_modules/engineering-scope` directory. This does not require
+`npm install --ignore-scripts /path/to/blinders.tgz`; configure the
+installed `node_modules/blinders` directory. This does not require
 lifecycle scripts.
 
 The V2 CLI command is
-`opencode plugin add github:Deepanshu-Khokhar/engineering-scope`. V2 `plugin add`
+`opencode plugin add github:Deepanshu-Khokhar/blinders`. V2 `plugin add`
 accepts npm and Git sources, not local `.tgz` files. Local packed-host acceptance
 does not establish GitHub-source installation; use the directory route for a
 local checkout.
 
-Restart OpenCode and use the same `$engineering-scope review` / `change`
+Restart OpenCode and use the same `$blinders review` / `change`
 commands. For noninteractive `opencode run`, pass the directive through stdin:
 these tested CLI versions quote positional messages containing spaces, which
 makes the directive quoted text instead of an instruction.
 V2 uses a typed tool error for a Guard denial, allowing the session to continue
 with permitted actions. `deps=ask` and `hash=ask` still require an explicit new
-contract. The optional `/esc` alias above is a V1 configuration example.
+contract. The optional `/blinders` alias above is a V1 configuration example.
 
 V2 reads delivered root-session user messages, ignores synthetic and child
 instructions as authority, and injects context before model requests. Native
@@ -138,8 +138,8 @@ Contract state and runtime evidence retain their existing format.
 
 Inspect these executable surfaces before trusting them:
 
-- `hooks/hooks.json` and `hooks/engineering-scope-claude.cjs` for Claude Code;
-- `opencode/engineering-scope.mjs`, `opencode/v2.mjs`, and `opencode/runtime.mjs`
+- `hooks/hooks.json` and `hooks/blinders-claude.cjs` for Claude Code;
+- `opencode/blinders.mjs`, `opencode/v2.mjs`, and `opencode/runtime.mjs`
   for OpenCode;
 - `src/adapters/`;
 - `src/`
@@ -151,21 +151,21 @@ package lifecycle scripts:
 npm install --ignore-scripts
 ```
 
-The `esc` CLI reads local runtime evidence:
+The `blinders` CLI reads local runtime evidence:
 
 ```bash
-npm run esc -- doctor
-npm run esc -- runtime
+npm run blinders -- doctor
+npm run blinders -- runtime
 ```
 
-`esc doctor` reports the resolved data directory and the number of runtime log
-files. `esc runtime` returns the stored metadata-only events. `esc explain
-<eventId>` shows one event with its labels, and `esc label <eventId>
+`blinders doctor` reports the resolved data directory and the number of runtime log
+files. `blinders runtime` returns the stored metadata-only events. `blinders explain
+<eventId>` shows one event with its labels, and `blinders label <eventId>
 correct|incorrect|inconclusive` records a manual label.
 
 ## Directive entry
 
-Submit one `$engineering-scope` directive on the first non-empty line, outside
+Submit one `$blinders` directive on the first non-empty line, outside
 quotes and code blocks. Up to three leading spaces are accepted; four spaces
 or a tab indicate a code example. Put task text after `--`, `: `, or a newline.
 Do not put an introduction before the directive. Embedded examples do not set
@@ -174,7 +174,7 @@ preserve the previous contract; submit a corrected directive before continuing.
 
 A standalone directive on a later line produces `DIRECTIVE_NOT_ARMED` context.
 The directive does not set contract fields. Send it first in a separate message,
-then query `$engineering-scope status`. Quoted and fenced examples remain
+then query `$blinders status`. Quoted and fenced examples remain
 context. The Hook does not remove prompt prefixes because its string input does
 not identify whether they came from the host or supplied content.
 
@@ -190,7 +190,7 @@ quote lines, and quoted text. For example, adding a `review only` example to
 README does not switch an active edit task to review.
 
 XML fragments and other embedded text do not establish a trusted directive
-source. To restore an authorized change, send `$engineering-scope change -- ...`
+source. To restore an authorized change, send `$blinders change -- ...`
 as a direct message with the directive on the first non-empty line. Use the host
 plugin manager directly to disable or uninstall the plugin when needed.
 
@@ -226,11 +226,11 @@ rules.
 
 ### Recover a damaged legacy session lock
 
-`ESC_LOCK_DAMAGED` means an old lock file has no valid owner PID. The Guard
+`BLINDERS_LOCK_DAMAGED` means an old lock file has no valid owner PID. The Guard
 preserves that file and the saved session state. Read-only recovery remains
 available, but new directives cannot be saved while the lock is damaged.
 
-Prefer a new host session and submit the required `$engineering-scope` directive
+Prefer a new host session and submit the required `$blinders` directive
 again. To recover the original session:
 
 1. Stop every host process and child process that shares the Guard's data
@@ -251,7 +251,7 @@ File age alone does not prove that its owner has stopped.
 Use a disposable repository. First arm read-only review:
 
 ```text
-/engineering-scope:engineering-scope review -- Review this repository. Report findings; do not edit.
+/blinders:blinders review -- Review this repository. Report findings; do not edit.
 ```
 
 A covered `Write`, `Edit`, `NotebookEdit`, `EnterWorktree`, mutating
@@ -259,13 +259,13 @@ A covered `Write`, `Edit`, `NotebookEdit`, `EnterWorktree`, mutating
 under the armed non-mutating contract. Then switch:
 
 ```text
-/engineering-scope:engineering-scope change -- Create scratch/esc-smoke.txt containing the word pass.
+/blinders:blinders change -- Create scratch/blinders-smoke.txt containing the word pass.
 ```
 
 That narrow write should proceed. For a file-lock test:
 
 ```text
-/engineering-scope:engineering-scope lock change files=scratch/esc-smoke.txt -- Change only this file.
+/blinders:blinders lock change files=scratch/blinders-smoke.txt -- Change only this file.
 ```
 
 A covered write to a different path should be denied.
@@ -276,8 +276,8 @@ If you do not want command Hooks, install only the advisory Skill. For Claude
 Code, copy the Skill into the user skills directory:
 
 ```bash
-mkdir -p ~/.claude/skills/engineering-scope
-cp skills/engineering-scope/SKILL.md ~/.claude/skills/engineering-scope/SKILL.md
+mkdir -p ~/.claude/skills/blinders
+cp skills/blinders/SKILL.md ~/.claude/skills/blinders/SKILL.md
 ```
 
 OpenCode discovers project Skills in `.claude/skills/`; `.opencode/skills/`
@@ -298,13 +298,13 @@ vary, and your existing sandbox and approval settings still apply.
 With the package executable installed:
 
 ```bash
-esc doctor --check-update
+blinders doctor --check-update
 ```
 
 From a source checkout:
 
 ```bash
-npm run esc -- doctor --check-update
+npm run blinders -- doctor --check-update
 ```
 
 Only this explicit command queries GitHub Releases. It returns `installed`,
@@ -319,7 +319,7 @@ the host or Skill Installer flow.
 Claude Code plugins are removed with the host's plugin controls:
 
 ```bash
-claude plugin uninstall engineering-scope
+claude plugin uninstall blinders
 ```
 
 Claude Code cleans up `CLAUDE_PLUGIN_DATA` when the plugin is uninstalled from
@@ -337,5 +337,5 @@ described above). Review that directory separately if you uninstall. See
 events.
 
 For a Skill-only installation, remove its exact installed directory
-(`~/.claude/skills/engineering-scope` for the Claude Code copy), then start a
+(`~/.claude/skills/blinders` for the Claude Code copy), then start a
 new task.

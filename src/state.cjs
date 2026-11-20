@@ -9,7 +9,7 @@ const { decodeState, freshState, recoveryState } = require('./state-schema.cjs')
 const LOCK_STALE_MS = 10000;
 
 function dataRoot(override) {
-  return override || process.env.PLUGIN_DATA || process.env.CLAUDE_PLUGIN_DATA || path.join(os.tmpdir(), 'engineering-scope-dev');
+  return override || process.env.PLUGIN_DATA || process.env.CLAUDE_PLUGIN_DATA || path.join(os.tmpdir(), 'blinders-dev');
 }
 
 function sessionKey(sessionId) {
@@ -29,7 +29,7 @@ function readState(sessionId, override) {
     const stat = fs.statSync(lock, { throwIfNoEntry: false });
     if (stat?.isFile() && Date.now() - stat.mtimeMs > LOCK_STALE_MS) legacyLockOwner(lock);
   } catch (error) {
-    if (error.code === 'ESC_LOCK_DAMAGED') return recoveryState({ code: error.code, message: error.message });
+    if (error.code === 'BLINDERS_LOCK_DAMAGED') return recoveryState({ code: error.code, message: error.message });
     // A completed migration may remove the old file or replace it with a directory.
     if (!['ENOENT', 'EISDIR'].includes(error.code)) throw error;
   }
@@ -93,8 +93,8 @@ function legacyLockOwner(file) {
     + 'Start a new host session and submit a new contract, or stop every host process using this data directory '
     + 'before moving only this lock file aside. Keep the saved state and delegation records. '
     + 'See INSTALL.md#recover-a-damaged-legacy-session-lock.');
-  error.name = 'ESC_LOCK_DAMAGED';
-  error.code = 'ESC_LOCK_DAMAGED';
+  error.name = 'BLINDERS_LOCK_DAMAGED';
+  error.code = 'BLINDERS_LOCK_DAMAGED';
   throw error;
 }
 
@@ -176,8 +176,8 @@ function acquireSessionLock(sessionId, override, options = {}) {
     }
     reclaimSessionLock(file, staleMs);
     if (Date.now() - started >= timeoutMs) {
-      const timeout = new Error(`Timed out waiting for Engineering Scope session lock: ${sessionKey(sessionId)}`);
-      timeout.code = 'ESC_LOCK_TIMEOUT';
+      const timeout = new Error(`Timed out waiting for Blinders session lock: ${sessionKey(sessionId)}`);
+      timeout.code = 'BLINDERS_LOCK_TIMEOUT';
       throw timeout;
     }
     sleepSync(10);
@@ -198,7 +198,7 @@ function updateSession(sessionId, override, update) {
   try {
     release = acquireSessionLock(sessionId, override);
   } catch (error) {
-    if (error.code !== 'ESC_LOCK_DAMAGED') throw error;
+    if (error.code !== 'BLINDERS_LOCK_DAMAGED') throw error;
     return update(recoveryState({ code: error.code, message: error.message }));
   }
   try {

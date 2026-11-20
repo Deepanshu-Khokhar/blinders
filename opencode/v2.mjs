@@ -82,7 +82,7 @@ export const openCodeV2Effect = (ctx) => Effect.gen(function* () {
     const current = yield* prepare(event.sessionID, true);
     const text = [current.reply, contractContext(current.state.contract, current.state.delegation,
       'active', current.state.directiveWarning, current.state.storageError)].filter(Boolean).join('\n');
-    event.system.push({ type: 'text', text: `Engineering Scope context:\n${current.state.directiveError
+    event.system.push({ type: 'text', text: `Blinders context:\n${current.state.directiveError
       ? directiveErrorText(current.state.directiveError) + '\n' : ''}${text}` });
   }));
 
@@ -108,7 +108,7 @@ export const openCodeV2Effect = (ctx) => Effect.gen(function* () {
     pendingContext.delete(callKey(event));
     if (text && event.status === 'completed') {
       const content = event.result.content;
-      const block = `<engineering_scope_context>\n${text}\n</engineering_scope_context>`;
+      const block = `<blinders_context>\n${text}\n</blinders_context>`;
       event.result = { ...event.result, content: Array.isArray(content)
         ? [...content, { type: 'text', text: block }] : [content, block].filter(Boolean).join('\n\n') };
     }
@@ -135,7 +135,7 @@ export const openCodeV2Effect = (ctx) => Effect.gen(function* () {
     handleControlEvent(toSubagentStopEvent({ id: sessionID }, { controlSessionID: root.id }), { dataDir });
   });
   yield* Stream.runForEach(ctx.event.subscribe(), (event) => onEvent(event).pipe(
-    Effect.catchCause(() => Effect.logWarning('Engineering Scope could not reconcile an OpenCode lifecycle event')),
+    Effect.catchCause(() => Effect.logWarning('Blinders could not reconcile an OpenCode lifecycle event')),
   )).pipe(Effect.forkScoped({ startImmediately: true }));
   yield* Effect.addFinalizer(() => Effect.sync(() => { roots.clear(); gates.clear(); pendingContext.clear(); }));
 });

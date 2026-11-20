@@ -1,11 +1,11 @@
 {
-  "name": "engineering-scope",
+  "name": "blinders",
   "owner": {
     "name": "Deepanshu Khokhar"
   },
   "plugins": [
     {
-      "name": "engineering-scope",
+      "name": "blinders",
       "source": "./",
       "description": "Scope control for coding agents: directives, file, dependency, hash, and subagent boundaries, enforced locally."
     }

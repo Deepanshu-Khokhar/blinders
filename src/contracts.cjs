@@ -29,7 +29,7 @@ function directiveHead(prompt, matchEnd) {
 function parseDirective(prompt) {
   // A directive starts the first non-empty line, outside quoted/code content.
   // Four spaces or a tab denote an indented code example, not an invocation.
-  const mention = /^(?:[ \t]*\r?\n)* {0,3}\$engineering-scope(?=$|[\s,:])/i.exec(prompt);
+  const mention = /^(?:[ \t]*\r?\n)* {0,3}\$blinders(?=$|[\s,:])/i.exec(prompt);
   if (!mention) return null;
 
   const head = directiveHead(prompt, mention.index + mention[0].length);
@@ -179,10 +179,10 @@ function unarmedDirectiveWarning(prompt) {
   // Host-generated prefixes and user introductions cannot be distinguished
   // from this text alone, so neither is removed to make a directive eligible.
   const prose = correctionProse(prompt);
-  if (!/^ {0,3}\$engineering-scope(?=$|[\s,:])/im.test(prose)) return null;
+  if (!/^ {0,3}\$blinders(?=$|[\s,:])/im.test(prose)) return null;
   return {
     code: 'DIRECTIVE_NOT_ARMED',
-    message: 'DIRECTIVE_NOT_ARMED: a Engineering Scope directive was not applied because it does not start the first non-empty line of the received prompt. Send the directive first in a separate message and check $engineering-scope status before continuing.'
+    message: 'DIRECTIVE_NOT_ARMED: a Blinders directive was not applied because it does not start the first non-empty line of the received prompt. Send the directive first in a separate message and check $blinders status before continuing.'
   };
 }
 

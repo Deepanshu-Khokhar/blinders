@@ -1,7 +1,7 @@
 {
-  "name": "engineering-scope",
+  "name": "blinders",
   "version": "1.0.0",
-  "description": "Scope control for Claude Code and OpenCode agents: finish what the task needs, skip what nothing needs, stay inside the requested authority, and stop when the result is verified.",
+  "description": "Blinders for coding agents: a turn-level scope contract for Claude Code and OpenCode, enforced at the tool boundary.",
   "keywords": [
     "claude-code",
     "opencode",
@@ -15,19 +15,19 @@
   "author": "Deepanshu Khokhar",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Deepanshu-Khokhar/engineering-scope.git"
+    "url": "git+https://github.com/Deepanshu-Khokhar/blinders.git"
   },
-  "homepage": "https://github.com/Deepanshu-Khokhar/engineering-scope#readme",
+  "homepage": "https://github.com/Deepanshu-Khokhar/blinders#readme",
   "bugs": {
-    "url": "https://github.com/Deepanshu-Khokhar/engineering-scope/issues"
+    "url": "https://github.com/Deepanshu-Khokhar/blinders/issues"
   },
-  "main": "./opencode/engineering-scope.mjs",
+  "main": "./opencode/blinders.mjs",
   "bin": {
-    "esc": "./scripts/esc.cjs"
+    "blinders": "./scripts/blinders.cjs"
   },
   "exports": {
-    ".": "./opencode/engineering-scope.mjs",
-    "./server": "./opencode/engineering-scope.mjs"
+    ".": "./opencode/blinders.mjs",
+    "./server": "./opencode/blinders.mjs"
   },
   "files": [
     "server.mjs",
@@ -36,7 +36,7 @@
     "hooks/",
     "assets",
     "skills/",
-    "scripts/esc.cjs",
+    "scripts/blinders.cjs",
     "scripts/case-bundle-lib.cjs",
     "scripts/generated/case-bundle-v1-validator.cjs",
     ".claude-plugin/",
@@ -45,7 +45,7 @@
     "README.md"
   ],
   "scripts": {
-    "esc": "node scripts/esc.cjs"
+    "blinders": "node scripts/blinders.cjs"
   },
   "engines": {
     "node": ">=18",

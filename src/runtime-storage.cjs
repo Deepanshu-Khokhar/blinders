@@ -6,7 +6,7 @@ const { StringDecoder } = require('node:string_decoder');
 const { dataRoot } = require('./state.cjs');
 
 function runtimeRoot(options = {}) {
-  const root = options.dataDir || process.env.ESC_RUNTIME_DATA || dataRoot();
+  const root = options.dataDir || process.env.BLINDERS_RUNTIME_DATA || dataRoot();
   return path.join(root, 'runtime');
 }
 

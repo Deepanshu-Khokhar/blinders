@@ -31,21 +31,21 @@ function contractContext(contract, delegation = {}, phase = 'active', directiveW
   if (contract.level === 'off') {
     return [
       directiveWarning && directiveWarning.message ? `Warning: ${directiveWarning.message}` : null,
-      'Engineering Scope is disabled for this session. No plugin decision is being enforced.'
+      'Blinders is disabled for this session. No plugin decision is being enforced.'
     ].filter(Boolean).join(' ');
   }
   if (contract.mode === 'unconfirmed') {
     return [
       directiveWarning && directiveWarning.message ? `Warning: ${directiveWarning.message}` : null,
-      'Engineering Scope is in watch-only mode because no task mode is confirmed.',
-      'Use $engineering-scope review for read-only work, or change for implementation. The default fast path relies on the Scope Ladder and does not claim a full machine contract.',
+      'Blinders is in watch-only mode because no task mode is confirmed.',
+      'Use $blinders review for read-only work, or change for implementation. The default fast path relies on the Scope Ladder and does not claim a full machine contract.',
       'Do not claim that mutations are being blocked until a mode is confirmed.'
     ].filter(Boolean).join(' ');
   }
 
   return [
     directiveWarning && directiveWarning.message ? `Warning: ${directiveWarning.message}` : null,
-    `Engineering Scope (${phase}): ${contractFields(contract, inspectDelegation(delegation))}`,
+    `Blinders (${phase}): ${contractFields(contract, inspectDelegation(delegation))}`,
     'Scope Ladder: Is it requested? Is it necessary? What reachable evidence proves that? Would omission fail the current acceptance?',
     'Report real findings even when implementation is not authorized.',
     'Before expanding scope, name reachable evidence, failure if omitted, and the fact that changes the next action.',
@@ -79,7 +79,7 @@ function decisionMessage(result, contract, event, responseOutcome, analysisReaso
 }
 
 function runtimeCommand(prompt) {
-  const match = /^(?:[ \t]*\r?\n)* {0,3}\$engineering-scope[ \t]+(status|runtime(?:[ \t]+all)?|explain[ \t]+(evt_[0-9a-f-]+)|label[ \t]+(evt_[0-9a-f-]+)[ \t]+(correct|incorrect|inconclusive))[ \t]*(?:\r?\n[ \t]*)*$/i.exec(prompt);
+  const match = /^(?:[ \t]*\r?\n)* {0,3}\$blinders[ \t]+(status|runtime(?:[ \t]+all)?|explain[ \t]+(evt_[0-9a-f-]+)|label[ \t]+(evt_[0-9a-f-]+)[ \t]+(correct|incorrect|inconclusive))[ \t]*(?:\r?\n[ \t]*)*$/i.exec(prompt);
   if (!match) return null;
   const words = match[1].toLowerCase().split(/\s+/);
   return { name: words[0], all: words[1] === 'all', eventId: match[2] || match[3] || null, label: match[4] || null };
@@ -89,7 +89,7 @@ function runtimeSummaryText(runtime) {
   const { summary } = runtime;
   const labels = summary.labels;
   const lines = [
-    'Engineering Scope runtime (host effect remains unobserved)',
+    'Blinders runtime (host effect remains unobserved)',
     `Checked actions: ${summary.checkedActions}`,
     `Context responses: ${summary.contextResponses}`,
     `Permission-deny responses: ${summary.permissionDenyResponses}`
@@ -108,7 +108,7 @@ function handleRuntimeCommand(command, event, state, options) {
   if (command.name === 'status') {
     const summary = inspectDelegation(state.delegation);
     return context([
-      'Engineering Scope status',
+      'Blinders status',
       `State: ${activeControlState(state.contract)} / ${state.contract.mode}`,
       contractFields(state.contract, summary),
       `Authority source: ${state.contract.source || 'unconfirmed'}`,
@@ -125,16 +125,16 @@ function handleRuntimeCommand(command, event, state, options) {
     return context(runtimeSummaryText(readRuntime(query, options)));
   }
   const runtime = readRuntime({ eventId: command.eventId }, options);
-  if (runtime.events.length === 0) return context(`Engineering Scope runtime event not found: ${command.eventId}`);
+  if (runtime.events.length === 0) return context(`Blinders runtime event not found: ${command.eventId}`);
   if (command.name === 'label') {
     const annotation = recordAnnotation(command.eventId, command.label, options);
     return context(annotation
-      ? `Engineering Scope label recorded: ${command.eventId} = ${command.label}`
-      : `Engineering Scope could not record label for ${command.eventId}.`);
+      ? `Blinders label recorded: ${command.eventId} = ${command.label}`
+      : `Blinders could not record label for ${command.eventId}.`);
   }
   const found = runtime.events[0];
   return context([
-    `Engineering Scope event ${found.eventId}`,
+    `Blinders event ${found.eventId}`,
     `State: ${found.controlState.toUpperCase()} / ${found.contract.mode}`,
     `Action: ${found.action.toolName} (${found.action.mutability}); paths=${found.action.pathCount}`,
     ...(isShellAnalysisReason(found.action.analysisReason)

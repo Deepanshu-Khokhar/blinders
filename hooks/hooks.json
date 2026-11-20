@@ -1,5 +1,5 @@
 {
-  "description": "Engineering Scope for Claude Code: local-first execution control for mode, scope, dependencies, hashing, and delegation.",
+  "description": "Blinders for Claude Code: local-first execution control for mode, scope, dependencies, hashing, and delegation.",
   "hooks": {
     "SessionStart": [
       {
@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/engineering-scope-claude.cjs\"",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/blinders-claude.cjs\"",
             "timeout": 5
           }
         ]
@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/engineering-scope-claude.cjs\"",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/blinders-claude.cjs\"",
             "timeout": 5
           }
         ]
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/engineering-scope-claude.cjs\"",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/blinders-claude.cjs\"",
             "timeout": 5
           }
         ]
@@ -42,7 +42,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/engineering-scope-claude.cjs\"",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/blinders-claude.cjs\"",
             "timeout": 5,
             "statusMessage": "Checking the Scope Ladder..."
           }
@@ -55,7 +55,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/engineering-scope-claude.cjs\"",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/blinders-claude.cjs\"",
             "timeout": 5
           }
         ]
@@ -67,7 +67,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/engineering-scope-claude.cjs\"",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/blinders-claude.cjs\"",
             "timeout": 5
           }
         ]
@@ -79,7 +79,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/engineering-scope-claude.cjs\"",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/blinders-claude.cjs\"",
             "timeout": 5
           }
         ]
@@ -91,7 +91,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/engineering-scope-claude.cjs\"",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/blinders-claude.cjs\"",
             "timeout": 5
           }
         ]

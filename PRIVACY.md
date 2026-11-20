@@ -5,7 +5,7 @@ telemetry, cloud service, transcript upload, or analytics endpoint. It runs
 locally. Both Skills are local instruction files; the host and model provider
 still determine how the model processes their content and the user's task.
 
-The optional `esc doctor --check-update` command sends one unauthenticated HTTPS
+The optional `blinders doctor --check-update` command sends one unauthenticated HTTPS
 request to the public GitHub Releases API only when the user invokes it. The
 request identifies this public repository and sends no prompt, transcript,
 runtime event, project path, code, or local configuration. The command returns

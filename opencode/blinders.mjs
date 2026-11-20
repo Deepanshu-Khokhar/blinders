@@ -15,16 +15,16 @@ const {
 const { contractContext, handleControlEvent } = require('../src/controller.cjs');
 const { readState, updateSession } = require('../src/state.cjs');
 
-const CONTEXT_PREFIX = 'Engineering Scope context:';
+const CONTEXT_PREFIX = 'Blinders context:';
 const MAX_TRACKED_MESSAGES = 1024;
 
 function appendToolContext(output, text) {
   if (!text || !output) return;
-  const block = `<engineering_scope_context>\n${text}\n</engineering_scope_context>`;
+  const block = `<blinders_context>\n${text}\n</blinders_context>`;
   output.output = output.output ? `${output.output}\n\n${block}` : block;
 }
 
-export const EngineeringScopePlugin = async ({ client, directory }, options = {}) => {
+export const BlindersPlugin = async ({ client, directory }, options = {}) => {
   const dataDir = resolveDataDir(options);
   const roots = new Map();
   const messageStates = new Map();
@@ -39,7 +39,7 @@ export const EngineeringScopePlugin = async ({ client, directory }, options = {}
     try {
       await client.app.log({
         body: {
-          service: 'engineering-scope',
+          service: 'blinders',
           level: 'error',
           message: `OpenCode adapter failed open during ${phase}`,
           extra: { error: error instanceof Error ? error.message : String(error) }
@@ -216,7 +216,7 @@ export const EngineeringScopePlugin = async ({ client, directory }, options = {}
   }
 
   // An explicit host mode switch is authorization: when a root-session user
-  // message that is not a $engineering-scope directive arrives under an
+  // message that is not a $blinders directive arrives under an
   // edit-capable agent while the contract is review, advance the contract to
   // change so the host's build mode and the guard no longer deadlock.
   async function advanceReviewOnEditableAgent(controlSessionID, info) {
@@ -365,8 +365,8 @@ export const EngineeringScopePlugin = async ({ client, directory }, options = {}
 
 // Both loaders resolve ./server. Each host selects its own native adapter.
 export default {
-  id: 'engineering-scope',
-  server: EngineeringScopePlugin,
+  id: 'blinders',
+  server: BlindersPlugin,
   // V1 does not need to load the V2 schema and hook implementation.
   effect: (ctx) => Effect.flatMap(Effect.promise(() => import('./v2.mjs')),
     ({ openCodeV2Effect }) => openCodeV2Effect(ctx)),

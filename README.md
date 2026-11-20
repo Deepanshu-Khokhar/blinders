@@ -1,8 +1,8 @@
 <p align="center"><img src="assets/icon.png" alt="" width="96"></p>
 
-<h1 align="center">Engineering Scope</h1>
+<h1 align="center">Blinders</h1>
 
-<p align="center"><b>A scope contract for coding agents. Say what the task may touch. Get that, and nothing extra.</b></p>
+<p align="center"><b>Your coding agent, with blinders on. It sees the task, not the tempting detour.</b></p>
 
 <p align="center">
   <img alt="Claude Code and OpenCode" src="https://img.shields.io/badge/hosts-Claude%20Code%20%7C%20OpenCode-2ea44f">
@@ -10,7 +10,7 @@
   <img alt="No telemetry" src="https://img.shields.io/badge/telemetry-none-2ea44f">
 </p>
 
-Coding agents are good at doing more than you asked: a one-line fix arrives with a new dependency, a refactor of a file nothing needed, and a verification run that repeats a check that already passed. Engineering Scope gives the agent a written contract for the turn — the mode, the files, the dependency policy, the subagent budget — and holds tool calls to it while the work happens.
+Coding agents are good at doing more than you asked: a one-line fix arrives with a new dependency, a refactor of a file nothing needed, and a verification run that repeats a check that already passed. A written contract for the turn — the mode, the files, the dependency policy, the subagent budget — gives the agent a boundary, and every tool call is held to it while the work happens.
 
 Two layers, one idea:
 
@@ -20,7 +20,7 @@ Two layers, one idea:
 No account, no service, no telemetry. State and audit logs stay on your machine.
 
 ```
-$engineering-scope change files=src/auth/** -- fix the token refresh race
+$blinders change files=src/auth/** -- fix the token refresh race
 ```
 
 ---
@@ -30,20 +30,20 @@ $engineering-scope change files=src/auth/** -- fix the token refresh race
 **Claude Code**
 
 ```sh
-/plugin marketplace add Deepanshu-Khokhar/engineering-scope
-/plugin install engineering-scope@engineering-scope
+/plugin marketplace add Deepanshu-Khokhar/blinders
+/plugin install blinders@blinders
 ```
 
 **OpenCode**
 
 ```sh
-opencode plugin add github:Deepanshu-Khokhar/engineering-scope
+opencode plugin add github:Deepanshu-Khokhar/blinders
 ```
 
 Then, in the first message of the task, write the contract:
 
 ```
-$engineering-scope change files=src/parser.js|test/parser.test.js -- reject empty keys and cover it
+$blinders change files=src/parser.js|test/parser.test.js -- reject empty keys and cover it
 ```
 
 Full setup, pinning, and project-level install in [INSTALL.md](INSTALL.md).
@@ -61,7 +61,7 @@ Full setup, pinning, and project-level install in [INSTALL.md](INSTALL.md).
 | A review turn starts editing files | Changes made without an explicit decision to change anything |
 | Subagents multiply and duplicate each other's work | Token spend, contradictory edits, merge noise |
 
-Engineering Scope does not try to make the agent smarter. It makes the boundary explicit and makes crossing it visible.
+Blinders does not try to make the agent smarter. It makes the boundary explicit and makes crossing it visible.
 
 ---
 
@@ -83,7 +83,7 @@ The contract lives in the conversation, not in a config file: each turn states w
 The directive is a normal message. It starts the first non-empty line, names the mode, optionally sets boundaries, then `--` and the task.
 
 ```
-$engineering-scope <mode> [files=…] [deps=deny|ask|allow] [hash=deny|ask|allow] [agents=N] -- <task>
+$blinders <mode> [files=…] [deps=deny|ask|allow] [hash=deny|ask|allow] [agents=N] -- <task>
 ```
 
 | Mode | What the agent may do |
@@ -161,20 +161,20 @@ The effect depends on the model and the task. This repository ships no benchmark
 ### Claude Code
 
 ```sh
-/plugin marketplace add Deepanshu-Khokhar/engineering-scope
-/plugin install engineering-scope@engineering-scope
+/plugin marketplace add Deepanshu-Khokhar/blinders
+/plugin install blinders@blinders
 ```
 
 The plugin registers the hooks and both skills. Check it:
 
 ```sh
-/engineering-scope status
+/blinders status
 ```
 
 ### OpenCode
 
 ```sh
-opencode plugin add github:Deepanshu-Khokhar/engineering-scope
+opencode plugin add github:Deepanshu-Khokhar/blinders
 ```
 
 To pin a revision or install into a project, see [INSTALL.md](INSTALL.md).
@@ -183,22 +183,22 @@ To pin a revision or install into a project, see [INSTALL.md](INSTALL.md).
 
 The guard is optional. Both skills are plain directories with a `SKILL.md`:
 
-- `skills/engineering-scope` — the full decision procedure for implementation work.
+- `skills/blinders` — the full decision procedure for implementation work.
 - `skills/scope-lite` — a compact companion for reader-facing prose that strips defensive hedging without removing real limits.
 
 Copy a directory into `.claude/skills/` or `.opencode/skills/`, or point the `skills` config array at it. Claude Code's plugin install already includes both.
 
 ### Verify the guard
 
-The `esc` CLI is part of the package. It is on your `PATH` after a global
+The `blinders` CLI is part of the package. It is on your `PATH` after a global
 install; from a checkout, run it through npm:
 
 ```sh
-npm run esc -- doctor
-npm run esc -- runtime
+npm run blinders -- doctor
+npm run blinders -- runtime
 ```
 
-`esc doctor` reports the plugin version, data directory, and log state. `esc runtime` lists recent decisions.
+`blinders doctor` reports the plugin version, data directory, and log state. `blinders runtime` lists recent decisions.
 
 ---
 
@@ -207,19 +207,19 @@ npm run esc -- runtime
 **A review that cannot edit:**
 
 ```
-$engineering-scope review -- find the cause of the duplicate order submission
+$blinders review -- find the cause of the duplicate order submission
 ```
 
 **A change with a narrow surface:**
 
 ```
-$engineering-scope change files=src/orders/** -- fix it and add the regression test
+$blinders change files=src/orders/** -- fix it and add the regression test
 ```
 
 **A change that may add one dependency:**
 
 ```
-$engineering-scope change deps=allow files=package.json|src/pdf/** -- generate the invoice PDF
+$blinders change deps=allow files=package.json|src/pdf/** -- generate the invoice PDF
 ```
 
 **Correcting course mid-turn:**
@@ -231,9 +231,9 @@ A plain-language correction replaces the previous instruction. The guard reads t
 **Status:**
 
 ```
-$engineering-scope status
-$engineering-scope runtime
-$engineering-scope explain evt_…
+$blinders status
+$blinders runtime
+$blinders explain evt_…
 ```
 
 ---
@@ -243,12 +243,12 @@ $engineering-scope explain evt_…
 Every decision is local, metadata-only, and readable:
 
 ```sh
-npm run esc -- runtime                     # recent events for the active data directory
-npm run esc -- explain <eventId>           # one decision with its annotations
-npm run esc -- label <eventId> correct     # mark an outcome for later review
+npm run blinders -- runtime                     # recent events for the active data directory
+npm run blinders -- explain <eventId>           # one decision with its annotations
+npm run blinders -- label <eventId> correct     # mark an outcome for later review
 ```
 
-From a global install, drop the `npm run` prefix and call `esc` directly.
+From a global install, drop the `npm run` prefix and call `blinders` directly.
 
 The log records the tool name, mutability class, mode, decision, reason code, and event ID. It does not record prompts, file paths, file contents, or command output. See [PRIVACY.md](PRIVACY.md).
 
@@ -257,12 +257,12 @@ The log records the tool name, mutability class, mode, decision, reason code, an
 ## Repository layout
 
 ```
-skills/engineering-scope/   the decision procedure (SKILL.md)
+skills/blinders/   the decision procedure (SKILL.md)
 skills/scope-lite/          compact prose companion
 src/                        contract parsing, decisions, state, audit
 hooks/                      Claude Code hook entry and registration
 opencode/                   OpenCode V1 and V2 plugin entries
-scripts/esc.cjs             doctor, runtime, explain, label, case tools
+scripts/blinders.cjs             doctor, runtime, explain, label, case tools
 .claude-plugin/             plugin and marketplace manifests
 ```
 
@@ -273,7 +273,7 @@ scripts/esc.cjs             doctor, runtime, explain, label, case tools
 1. **The contract is text you can read.** The directive is in the conversation, and the decision is in the log.
 2. **Allow by default inside the boundary.** The guard narrows scope; it does not make the agent ask permission for ordinary work.
 3. **Deny with a next step.** Every refusal names the rule and what would satisfy it.
-4. **Local first.** No account, no server, no telemetry. The only outbound call is an optional release check in `esc doctor --check-update`.
+4. **Local first.** No account, no server, no telemetry. The only outbound call is an optional release check in `blinders doctor --check-update`.
 5. **Fail open and say so.** A guard bug must not block your work; it must be visible in the log.
 
 ---
@@ -282,4 +282,4 @@ scripts/esc.cjs             doctor, runtime, explain, label, case tools
 
 Version 1.0.0. Supports Claude Code and OpenCode (V1 and V2 plugin APIs) on Node.js 18 or newer. The skill layer is host-agnostic and works without the guard.
 
-Issues and concrete reproductions are welcome: [github.com/Deepanshu-Khokhar/engineering-scope/issues](https://github.com/Deepanshu-Khokhar/engineering-scope/issues).
+Issues and concrete reproductions are welcome: [github.com/Deepanshu-Khokhar/blinders/issues](https://github.com/Deepanshu-Khokhar/blinders/issues).
