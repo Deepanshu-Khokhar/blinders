@@ -37,15 +37,16 @@ function contractContext(contract, delegation = {}, phase = 'active', directiveW
   if (contract.mode === 'unconfirmed') {
     return [
       directiveWarning && directiveWarning.message ? `Warning: ${directiveWarning.message}` : null,
-      'Blinders is in watch-only mode because no task mode is confirmed.',
-      'Use $blinders review for read-only work, or change for implementation. The default fast path relies on the Scope Ladder and does not claim a full machine contract.',
-      'Do not claim that mutations are being blocked until a mode is confirmed.'
+      'Blinders is observing. No directive is needed: each request is read for its task shape.',
+      'A read-only request arms review, an implementation request arms change, and $blinders <mode> overrides both. The Scope Ladder is the default fast path.',
+      'Mutations are not blocked until a request arms a mode, and harness coverage is a guardrail rather than a security boundary.'
     ].filter(Boolean).join(' ');
   }
 
   return [
     directiveWarning && directiveWarning.message ? `Warning: ${directiveWarning.message}` : null,
-    `Blinders (${phase}): ${contractFields(contract, inspectDelegation(delegation))}`,
+    `Blinders (${contract.source === 'ambient' ? 'auto' : phase}): ${contractFields(contract, inspectDelegation(delegation))}`,
+    contract.source === 'ambient' ? 'Scope was inferred from the request. A $blinders directive overrides it.' : null,
     'Scope Ladder: Is it requested? Is it necessary? What reachable evidence proves that? Would omission fail the current acceptance?',
     'Report real findings even when implementation is not authorized.',
     'Before expanding scope, name reachable evidence, failure if omitted, and the fact that changes the next action.',

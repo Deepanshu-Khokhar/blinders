@@ -1,7 +1,12 @@
 # Install Blinders
 
-These instructions target version 1.0.0. For local checkout validation, use the
+These instructions target version 1.1.0. For local checkout validation, use the
 flow under [Verify the source](#verify-the-source).
+
+No directive is needed after installation: each request arms the turn it
+describes. A read-only ask arms `review`; an implementation ask arms `change`; a
+named dependency arms `deps=allow`. A `$blinders ...` directive is an optional
+override when the boundary has to be exact.
 
 ## Claude Code: Skill + Guard
 
@@ -23,8 +28,9 @@ claude plugin install blinders@blinders
 Restart Claude Code after installation. The packaged manifest registers:
 
 - `SessionStart` — injects the current contract into a new session;
-- `UserPromptSubmit` — reads host-neutral `$blinders ...` directives,
-  natural explicit corrections, and the direct namespaced slash form
+- `UserPromptSubmit` — reads each request for its turn shape, plus
+  host-neutral `$blinders ...` directives, natural explicit corrections, and
+  the direct namespaced slash form
   (`/blinders:blinders ...`). Handling the slash form here
   keeps direct Skill invocation armed even on hosts that do not expose the
   `UserPromptExpansion` event;
@@ -51,7 +57,8 @@ opencode plugin add github:Deepanshu-Khokhar/blinders
 
 The command installs the package into OpenCode's cache and adds the GitHub spec
 to the global OpenCode configuration. Package lifecycle scripts are not run.
-Restart OpenCode, then set a contract with the host-neutral form:
+Restart OpenCode, then work normally: the request arms its own turn. To be
+exact, or to review read-only, use the host-neutral form:
 
 ```text
 $blinders review -- Review this diff; do not edit.

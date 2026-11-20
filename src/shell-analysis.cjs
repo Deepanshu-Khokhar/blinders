@@ -145,7 +145,8 @@ function shellClassification(mutability, analysisReason) {
 function combineClassifications(classifications) {
   const kinds = classifications.map(result => result.mutability);
   const mutability = kinds.includes('write') ? 'write'
-    : kinds.every(kind => kind === 'read') ? 'read' : 'unknown';
+    : kinds.includes('unknown') ? 'unknown'
+      : kinds.includes('control') ? 'control' : 'read';
   const decisive = classifications.find(result => result.mutability === mutability);
   return shellClassification(mutability, decisive?.analysisReason);
 }
@@ -240,6 +241,27 @@ function classifyGitQueryArguments(args) {
   return shellClassification('read');
 }
 
+// Test runners execute project code but do not change the contract to a write
+// task: they are the standard way to gather evidence during a review.
+const TEST_RUNNER_COMMANDS = new Set([
+  'pytest', 'py.test', 'jest', 'vitest', 'mocha', 'ava', 'phpunit', 'rspec', 'ctest'
+]);
+const TEST_SCRIPT = /^test(?::.+)?$/;
+
+function classifyTestArguments(name, args) {
+  if (TEST_RUNNER_COMMANDS.has(name)) return shellClassification('control');
+  if (name === 'node' && args[0] === '--test') return shellClassification('control');
+  if (['python', 'python3', 'py'].includes(name) && args[0] === '-m' && TEST_RUNNER_COMMANDS.has(args[1])) return shellClassification('control');
+  if (['cargo', 'go', 'dotnet', 'deno', 'mix'].includes(name) && args[0] === 'test') return shellClassification('control');
+  if (name === 'make' && args[0] === 'test') return shellClassification('control');
+  if (['npm', 'pnpm', 'yarn', 'bun'].includes(name)) {
+    if (args[0] === 'test' || args[0] === 't') return shellClassification('control');
+    if (args[0] === 'run' && TEST_SCRIPT.test(args[1] || 'test')) return shellClassification('control');
+  }
+  if (['npx', 'bunx', 'uvx'].includes(name) && TEST_RUNNER_COMMANDS.has(args[0])) return shellClassification('control');
+  return null;
+}
+
 function classifyCommandArguments(name, args) {
   if (name === 'git') {
     // Only these global options preserve the supported command interpretation.
@@ -257,6 +279,8 @@ function classifyCommandArguments(name, args) {
     if (['status', 'diff', 'log', 'show', 'rev-parse'].includes(subcommand)) return classifyGitQueryArguments(args);
     return shellClassification('unknown', 'git_arguments_unproven');
   }
+  const testRunner = classifyTestArguments(name, args);
+  if (testRunner) return testRunner;
   if (['npm', 'pnpm', 'yarn'].includes(name) && ['add', 'install', 'remove', 'uninstall', 'publish'].includes(args[0])) return shellClassification('write');
   if (['pip', 'pip3'].includes(name) && args[0] === 'install') return shellClassification('write');
   if (name === 'gh' && /^(?:pr (?:create|merge|close)|issue (?:create|close)|release create)$/.test(args.slice(0, 2).join(' '))) return shellClassification('write');

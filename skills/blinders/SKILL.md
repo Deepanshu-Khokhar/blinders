@@ -8,8 +8,8 @@ description: Complete requested work while preventing speculative defenses and s
 Meet the task's responsibilities in full. Let real needs drive complexity.
 
 This Skill is advisory and works without the Guard hooks. It cannot guarantee
-model behavior. When the Guard is installed, the same directives also provide
-machine-enforced boundaries on supported host action paths.
+model behavior. When the Guard is installed, it also reads each request and
+enforces the turn at the host's tool boundary, so no directive is needed.
 
 ## Follow the Scope Ladder
 
@@ -85,13 +85,26 @@ attribute uncertain claims instead of surrounding them with disclaimers.
 ## Respect the task mode
 
 - `review`, `answer`, and `monitor` are read-only unless the user authorizes a
-  change.
+  change. Running the test suite and read-only shell commands is part of
+  review; they do not count as mutation.
 - `change` permits only requested work and necessary consequences.
+- `open` is write authority without a file boundary; dependency and hash
+  policies still apply.
 - Necessary work does not override an explicit file lock or a narrower action
   boundary. Explain a required boundary change before acting outside it.
 
-With Skill only, treat the mode as an instruction. With the Guard installed,
-use the host-native invocation form.
+With Skill only, treat the mode as an instruction read from the request. With
+the Guard installed, the turn's block in the host context states the actual
+mode, and that block is the authority.
+
+A read-only request — review, explain, inspect, a question — arms `review`:
+report findings, do not edit. An implementation request — fix, add, refactor,
+rename, install, and similar — arms `change`: complete it, including necessary
+callers and tests. A request that names a dependency arms `deps=allow`; one
+that does not keeps `deps=ask`, so do not add one on your own.
+
+Do not ask the user for a mode or a directive. Work from the request. Use a
+directive only when the boundary must be exact or the user asks for one.
 
 Claude Code plugin:
 
@@ -110,12 +123,13 @@ $blinders review -- Review this diff. Report findings; do not edit.
 Submit one directive on the first non-empty line, outside quotes and code
 blocks. Put task text after `--`, `: `, or a newline. Embedded examples do not
 set directive fields. Unknown fields or conflicting values leave the previous
-contract unchanged and require a corrected directive.
+contract unchanged and require a corrected directive. `$blinders watch` keeps
+the Guard observing without blocking; `$blinders off` disables it.
 
-An installed Guard begins in observation-only `unconfirmed` mode. Do not claim
-that an action was blocked unless an explicit mode armed the Guard and the Guard
-returned a host-specific denial. Even then, describe the host effect as
-unobserved.
+The Guard reports its live state in each turn. Do not claim that an action was
+blocked unless the Guard returned a host-specific denial; even then, describe
+the host effect as unobserved. At session start, before the first request arms
+a turn, nothing is blocked.
 
 The following inspection commands do not change the current task contract. In
 Claude Code, pass the text after the namespaced slash command; in OpenCode, use

@@ -1,6 +1,6 @@
 {
   "name": "blinders",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Blinders for coding agents: a turn-level scope contract for Claude Code and OpenCode, enforced at the tool boundary.",
   "keywords": [
     "claude-code",
@@ -36,6 +36,7 @@
     "hooks/",
     "assets",
     "skills/",
+    "assets/",
     "scripts/blinders.cjs",
     "scripts/case-bundle-lib.cjs",
     "scripts/generated/case-bundle-v1-validator.cjs",
@@ -45,7 +46,8 @@
     "README.md"
   ],
   "scripts": {
-    "blinders": "node scripts/blinders.cjs"
+    "blinders": "node scripts/blinders.cjs",
+    "test": "node --test test/"
   },
   "engines": {
     "node": ">=18",

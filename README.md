@@ -10,18 +10,28 @@
   <img alt="No telemetry" src="https://img.shields.io/badge/telemetry-none-2ea44f">
 </p>
 
-Coding agents are good at doing more than you asked: a one-line fix arrives with a new dependency, a refactor of a file nothing needed, and a verification run that repeats a check that already passed. A written contract for the turn — the mode, the files, the dependency policy, the subagent budget — gives the agent a boundary, and every tool call is held to it while the work happens.
+Coding agents are good at doing more than you asked: a one-line fix arrives with a new dependency, a refactor of a file nothing needed, and a verification run that repeats a check that already passed.
 
-Two layers, one idea:
+Blinders reads the request you already wrote and holds the turn to it:
 
-- **The skill** tells the agent how to decide what belongs in the change. It works alone, in any host that supports skills.
-- **The guard** enforces the contract at the host's tool boundary, locally, on every tool call. It works in **Claude Code** and **OpenCode**.
+```
+review the retry logic and tell me where it loops   ->  read-only turn
+fix the failing auth test                           ->  change turn
+install zod and use it in the signup form           ->  change turn, dependency allowed
+```
 
-No account, no service, no telemetry. State and audit logs stay on your machine.
+No directive to type. When the boundary has to be exact, one line makes it exact:
 
 ```
 $blinders change files=src/auth/** -- fix the token refresh race
 ```
+
+Two layers, one idea:
+
+- **The skill** tells the agent how to decide what belongs in the change. It works alone, in any host that supports skills.
+- **The guard** reads each request, then enforces the turn at the host's tool boundary, locally, on every tool call. It works in **Claude Code** and **OpenCode**.
+
+No account, no service, no telemetry. State and audit logs stay on your machine.
 
 ---
 
@@ -40,7 +50,9 @@ $blinders change files=src/auth/** -- fix the token refresh race
 opencode plugin add github:Deepanshu-Khokhar/blinders
 ```
 
-Then, in the first message of the task, write the contract:
+Then work normally. A read-only ask cannot edit. An implementation ask can write. A dependency has to be named in the request.
+
+When the surface has to be exact, put one line first:
 
 ```
 $blinders change files=src/parser.js|test/parser.test.js -- reject empty keys and cover it
@@ -76,9 +88,23 @@ Blinders does not try to make the agent smarter. It makes the boundary explicit 
       +-> skill context     +-> local audit log <--+
 ```
 
-The contract lives in the conversation, not in a config file: each turn states what it may touch, so a read-only review turn and an implementation turn are visibly different.
+The contract lives in the conversation, not in a config file, so a read-only review turn and an implementation turn are visibly different.
 
-### 1. A directive sets the contract
+### 1. The request sets the contract
+
+On each message the guard reads the plain request for its shape. It ignores fenced code and quoted lines, so an example inside a prompt is not an instruction.
+
+| The request | Armed for the turn |
+| --- | --- |
+| Starts with a read verb — review, audit, explain, inspect, investigate, diagnose, compare, check — and names no change | `review`: inspect and report, no writes |
+| Ends in a question and names no change | `review` |
+| Names implementation work — fix, add, implement, refactor, rename, remove, upgrade, install, and similar | `change`: write, no guessed file limit |
+| Names a dependency — `install zod`, `add the zod package`, `bump react` | `change` with `deps=allow`; otherwise dependencies stay `ask` |
+| Has no readable shape yet | `open`: write authority without a file limit |
+
+Inference sets the mode and the dependency policy. It never guesses a `files=` boundary from prose — when the surface matters, say it with one directive. A later turn that names implementation work escalates a read-only turn; a later turn that starts with a read verb and names no change narrows it back. An explicit directive always wins over inference.
+
+#### When you want an exact contract
 
 The directive is a normal message. It starts the first non-empty line, names the mode, optionally sets boundaries, then `--` and the task.
 
@@ -86,10 +112,12 @@ The directive is a normal message. It starts the first non-empty line, names the
 $blinders <mode> [files=…] [deps=deny|ask|allow] [hash=deny|ask|allow] [agents=N] -- <task>
 ```
 
+`$blinders watch` keeps the guard observing without blocking. `$blinders off` turns it off for the session.
+
 | Mode | What the agent may do |
 | --- | --- |
 | `answer` | Read, explain, and answer. No repository mutation. |
-| `review` | Inspect and report findings. No repository mutation. |
+| `review` | Inspect, run tests, and report findings. No repository mutation. |
 | `change` | Mutate only inside the declared boundary. |
 | `monitor` | Watch and report. No repository mutation. |
 | `open` | No file boundary for this turn. Dependency and hash policies still apply. |
@@ -204,11 +232,12 @@ npm run blinders -- runtime
 
 ## Daily use
 
-**A review that cannot edit:**
+**Nothing special: ask the question you were going to ask.**
 
 ```
-$blinders review -- find the cause of the duplicate order submission
+find the cause of the duplicate order submission
 ```
+That turn is read-only, so the agent reports instead of editing.
 
 **A change with a narrow surface:**
 
@@ -270,7 +299,7 @@ scripts/blinders.cjs             doctor, runtime, explain, label, case tools
 
 ## Design rules
 
-1. **The contract is text you can read.** The directive is in the conversation, and the decision is in the log.
+1. **The contract is text you can read.** It comes from your request, or from a directive when you need one, and the decision is in the log.
 2. **Allow by default inside the boundary.** The guard narrows scope; it does not make the agent ask permission for ordinary work.
 3. **Deny with a next step.** Every refusal names the rule and what would satisfy it.
 4. **Local first.** No account, no server, no telemetry. The only outbound call is an optional release check in `blinders doctor --check-update`.
@@ -280,6 +309,6 @@ scripts/blinders.cjs             doctor, runtime, explain, label, case tools
 
 ## Status
 
-Version 1.0.0. Supports Claude Code and OpenCode (V1 and V2 plugin APIs) on Node.js 18 or newer. The skill layer is host-agnostic and works without the guard.
+Version 1.1.0. Supports Claude Code and OpenCode (V1 and V2 plugin APIs) on Node.js 18 or newer. The skill layer is host-agnostic and works without the guard.
 
 Issues and concrete reproductions are welcome: [github.com/Deepanshu-Khokhar/blinders/issues](https://github.com/Deepanshu-Khokhar/blinders/issues).

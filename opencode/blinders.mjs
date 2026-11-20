@@ -1,5 +1,5 @@
 import { createRequire } from 'node:module';
-import { directiveErrorText, mentionsDirective, resolveDataDir } from './runtime.mjs';
+import { directiveErrorText, resolveDataDir } from './runtime.mjs';
 import * as Effect from 'effect/Effect';
 
 const require = createRequire(import.meta.url);
@@ -33,7 +33,6 @@ export const BlindersPlugin = async ({ client, directory }, options = {}) => {
   const pending = new Map();
   const lastInjected = new Map();
   const pendingContext = new Map();
-  let editCapabilities = null;
 
   async function logFailure(phase, error) {
     try {
@@ -190,47 +189,6 @@ export const BlindersPlugin = async ({ client, directory }, options = {}) => {
     }
   }
 
-  async function agentEditCapabilities() {
-    if (editCapabilities) return editCapabilities;
-    try {
-      const response = await client.app.agents();
-      const map = new Map();
-      for (const agent of (response && response.data) || []) {
-        if (!agent || !agent.name) continue;
-        const permission = agent.permission || {};
-        map.set(agent.name, permission.edit !== 'deny');
-      }
-      editCapabilities = map;
-    } catch (error) {
-      await logFailure('agent list', error);
-      editCapabilities = new Map();
-    }
-    return editCapabilities;
-  }
-
-  async function agentAllowsEdits(agentName) {
-    const capabilities = await agentEditCapabilities();
-    // Unknown agents fail open; the host permission layer still applies.
-    if (!capabilities.has(agentName)) return true;
-    return capabilities.get(agentName);
-  }
-
-  // An explicit host mode switch is authorization: when a root-session user
-  // message that is not a $blinders directive arrives under an
-  // edit-capable agent while the contract is review, advance the contract to
-  // change so the host's build mode and the guard no longer deadlock.
-  async function advanceReviewOnEditableAgent(controlSessionID, info) {
-    const current = readState(controlSessionID, dataDir);
-    if (current.directiveError || current.contract.mode !== 'review') return false;
-    const agentName = info && info.agent;
-    if (!agentName || !(await agentAllowsEdits(agentName))) return false;
-    return updateSession(controlSessionID, dataDir, (state) => {
-      if (state.directiveError || state.contract.mode !== 'review') return false;
-      state.contract = { ...state.contract, mode: 'change', source: 'host' };
-      return true;
-    });
-  }
-
   async function processUserText(sessionID, info, text, sequence) {
     const resolved = await resolveRoot(sessionID, 'session resolution');
     const controlSessionID = resolved.sessionID;
@@ -248,9 +206,6 @@ export const BlindersPlugin = async ({ client, directory }, options = {}) => {
       };
       const output = { message: info || {}, parts: [{ type: 'text', text }] };
       result = handleOpenCodeMessage(input, output, { controlSessionID, directory }, { dataDir });
-      if (!mentionsDirective(text) && await advanceReviewOnEditableAgent(controlSessionID, info)) {
-        result = null;
-      }
       lastAppliedMessage.set(controlSessionID, sequence);
     }
     const state = readState(controlSessionID, dataDir);

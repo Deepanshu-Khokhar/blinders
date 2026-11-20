@@ -174,6 +174,60 @@ function naturalCorrection(prompt, previous) {
   return null;
 }
 
+// Ambient scope: no directive is typed, so the request itself is read for a
+// task shape. Only mode and dependency authority are inferred; a path boundary
+// is never guessed from prose. Explicit directives always win.
+const CHANGE_REQUEST = /\b(?:fix|add|implement|build|create|change|update|adjust|tweak|refactor|rename|remove|delete|replace|move|extract|split|merge|wire|migrate|upgrade|bump|install|patch|apply|convert|optimi[sz]e|improve|rewrite|set\s+up|clean\s+up)\b/i;
+const READ_REQUEST = /^(?:please\s+)?(?:(?:now|then|next|ok|okay|alright|so|and|also)\s+)*(?:(?:can|could|would)\s+you\s+|let's\s+|lets\s+)?(?:review|audit|analy[sz]e|explain|inspect|investigate|diagnose|summari[sz]e|compare|trace|check|read|look\s+(?:at|into)|tell\s+me|show\s+me|walk\s+me|find\s+(?:the\s+)?(?:cause|problem|issue))\b/i;
+const DEPENDENCY_REQUEST = /\b(?:npm|pnpm|yarn|bun)\s+(?:i|add|install)\b|\b(?:pip3?|uv|poetry)\s+(?:add|install)\b|\bcargo\s+add\b|\bgo\s+get\b|\b(?:upgrade|bump)\s+[a-z@][\w@/.-]*\s+to\b|\b(?:add|install|introduce|bring\s+in|pull\s+in|upgrade|bump|update)\b[^.\n]{0,48}\b(?:dependenc(?:y|ies)|packages?|librar(?:y|ies)|modules?)\b/i;
+const INSTALL_TARGET = /\b(?:install|add)\s+(@?[a-z][\w@/.-]{1,60})/gi;
+const NOT_A_PACKAGE = new Set(['it', 'them', 'this', 'that', 'these', 'those', 'everything', 'all', 'something', 'the', 'a', 'an', 'and', 'then', 'now', 'first', 'again', 'locally', 'globally', 'properly', 'correctly', 'one', 'two', 'some', 'more', 'tests', 'test', 'code', 'docs', 'support', 'handling', 'logging', 'caching', 'metrics', 'retries', 'validation', 'comments']);
+
+function mentionsDependency(prose) {
+  if (DEPENDENCY_REQUEST.test(prose)) return true;
+  for (const match of prose.matchAll(INSTALL_TARGET)) {
+    if (!NOT_A_PACKAGE.has(match[1].toLowerCase())) return true;
+  }
+  return false;
+}
+const NEGATED_CLAUSE = /\b(?:do not|don't|dont|never)\b[^,.;\n]{0,60}/gi;
+const PROHIBITS_EDITS = /\b(?:do not|don't|dont|never)\b[^,.;\n]{0,40}\b(?:change|edit|modify|touch|write)\b|\bno\s+(?:code\s+|file\s+)?(?:changes?|edits?|modifications?|rewrites?)\b|\bread[- ]only\b|\bwithout\s+(?:changing|editing|modifying|touching)\b/i;
+const NEGATED_DEPS = /\b(?:do not|don't|dont|never|no|without)\b[^,.;\n]{0,40}\b(?:dependenc(?:y|ies)|new\s+(?:deps|packages?|librar(?:y|ies)))\b/i;
+
+function inferAmbientMode(prompt) {
+  const prose = correctionProse(prompt).replace(/<([a-z][\w:-]*)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, ' ');
+  if (!prose) return null;
+  // Drop a prohibition clause so "don't change the API, fix the parser" still
+  // reads as implementation work. A bare prohibition then falls to review.
+  const active = prose.replace(NEGATED_CLAUSE, ' ').replace(/\uFFFC+/g, ' ').trim();
+  if (!active) return null;
+  if (CHANGE_REQUEST.test(active)) return 'change';
+  if (READ_REQUEST.test(active)) return 'review';
+  if (PROHIBITS_EDITS.test(prose)) return 'review';
+  if (/\?\s*$/.test(active)) return 'review';
+  return null;
+}
+
+function ambientContract(contract, prompt) {
+  // A typed directive, a natural correction, recovery, or an explicit off all
+  // outrank inference. Ambience is a starting point, not an override.
+  if (contract.level === 'off') return null;
+  if (contract.source && contract.source !== 'default' && !/^ambient/.test(contract.source)) return null;
+  if (!String(prompt || '').trim()) return null;
+  const inferred = inferAmbientMode(prompt);
+  // A first request with no readable shape still arms open authority, so the
+  // agent is never left shadowing the turn. Later turns keep the shape they have.
+  const mode = inferred || (contract.mode === 'unconfirmed' ? 'open' : null);
+  if (!mode) return null;
+  const prose = correctionProse(prompt).replace(/<([a-z][\w:-]*)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, ' ');
+  const dependency = mode === 'change'
+    && mentionsDependency(prose)
+    && !NEGATED_DEPS.test(prose);
+  const changedMode = mode !== contract.mode;
+  if (!changedMode && !(dependency && contract.dependencyPolicy !== 'allow')) return null;
+  return { mode, dependency };
+}
+
 function unarmedDirectiveWarning(prompt) {
   // Report an unquoted standalone directive without treating it as authority.
   // Host-generated prefixes and user introductions cannot be distinguished
@@ -215,6 +269,7 @@ function parseContractPrompt(prompt, previousContract = defaultContract()) {
   const correction = naturalCorrection(text, previous);
   const next = { ...previous };
   let changed = false;
+  let ambientApplied = false;
 
   if (directive) {
     if (directive.error) {
@@ -269,6 +324,24 @@ function parseContractPrompt(prompt, previousContract = defaultContract()) {
       changed = true;
     }
     next.source = correction.source;
+  } else {
+    const ambient = ambientContract(next, text);
+    if (ambient) {
+      if (ambient.mode !== next.mode) {
+        next.mode = ambient.mode;
+        changed = true;
+      }
+      if (ambient.dependency && next.dependencyPolicy !== 'allow') {
+        next.dependencyPolicy = 'allow';
+        changed = true;
+      }
+      if (next.level === 'watch') {
+        next.level = 'guard';
+        changed = true;
+      }
+      next.source = 'ambient';
+      ambientApplied = true;
+    }
   }
 
   if (next.mode === 'unconfirmed' && next.level !== 'off') {
@@ -280,6 +353,7 @@ function parseContractPrompt(prompt, previousContract = defaultContract()) {
     changed,
     directive: Boolean(directive),
     correction: Boolean(correction),
+    ambient: ambientApplied,
     warning: directive ? directive.warning : unarmedDirectiveWarning(text),
     error: null
   };
@@ -292,6 +366,7 @@ module.exports = {
   MODES,
   DEFAULT_AGENT_LIMIT,
   defaultContract,
+  inferAmbientMode,
   normalizeContract,
   parseContractPrompt
 };
