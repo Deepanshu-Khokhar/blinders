@@ -308,8 +308,10 @@ npm run esc -- doctor --check-update
 ```
 
 Only this explicit command queries GitHub Releases. It returns `installed`,
-`latest`, and `releaseUrl`. It does not install updates or display reminders
-during startup or tasks. Standalone `scope-lite` installations update through
+`latest`, `releaseUrl`, and `releasePublished`. When the repository has no
+published release, `latest` and `releaseUrl` are `null` and the command still
+succeeds. It does not install updates or display reminders during startup or
+tasks. Standalone `scope-lite` installations update through
 the host or Skill Installer flow.
 
 ## Disable or uninstall

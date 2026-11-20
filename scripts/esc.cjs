@@ -57,12 +57,13 @@ async function latestRelease() {
     },
     signal: AbortSignal.timeout(10_000)
   });
+  if (response.status === 404) return { latest: null, releaseUrl: null, releasePublished: false };
   if (!response.ok) throw new Error(`release lookup failed: HTTP ${response.status}`);
   const release = await response.json();
   if (typeof release.tag_name !== 'string' || typeof release.html_url !== 'string') {
     throw new Error('release lookup returned an invalid response');
   }
-  return { latest: release.tag_name, releaseUrl: release.html_url };
+  return { latest: release.tag_name, releaseUrl: release.html_url, releasePublished: true };
 }
 
 async function doctor(dataDir, options = {}) {
